@@ -23,13 +23,15 @@ plot(unique(data.attrib$Room), unique(data.attrib$self_s.mean),xlab="Rooms",ylab
 dev.off()
 
 # check LA
-png(file = "output/1.LA_comparison.png", units="px", width=500, height=500, res=100)
+# cbPalette2 = c("gray", "yellow3", "skyblue", "green3", "#0072B2", "#D55E00", "orange")
+cbPalette2 = c("gray","yellow","cyan","blue","magenta","red")
+# png(file = "output/1.LA_comparison.png", units="px", width=500, height=500, res=100)
 p1 = ggplot() +
   geom_line(data = data.attrib, aes(x = Date, y = LA, group = as.factor(Room), colour=as.factor(Room))) +
   geom_point(size=2) +
-  ylab(expression(LA~(m^{2}~g~C^{-1}))) + 
+  ylab(expression(LA~(m^{2}~plant^{-1}))) + 
   # annotate("text", x = min(shift.output.Mleaf$Date), y = max(shift.output.Mleaf$value), size = font.size, label = paste(title[7])) +
-  scale_colour_manual(breaks=c("1","2","3","4","5","6"),labels=c("Room 1","Room 2","Room 3","Room 4","Room 5","Room 6"),values=cbPalette[1:6]) +
+  scale_colour_manual(breaks=c("1","2","3","4","5","6"),labels=c("Room 1","Room 2","Room 3","Room 4","Room 5","Room 6"),values=cbPalette2) +
   theme_bw() +
   theme(legend.position = c(0.25,0.67),legend.text.align = 0) +
   theme(legend.title = element_blank()) +
@@ -39,7 +41,42 @@ p1 = ggplot() +
   theme(axis.title.x = element_blank()) +
   theme(axis.title.y = element_text(size = font.size, vjust=0.3)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) 
-p1
+
+p2 = ggplot() +
+  geom_line(data = data.attrib, aes(x = Date, y = Leafmass, group = as.factor(Room), colour=as.factor(Room))) +
+  geom_point(size=2) +
+  ylab(expression(LM~(g~C~plant^{-1}))) + 
+  # annotate("text", x = min(shift.output.Mleaf$Date), y = max(shift.output.Mleaf$value), size = font.size, label = paste(title[7])) +
+  scale_colour_manual(breaks=c("1","2","3","4","5","6"),labels=c("Room 1","Room 2","Room 3","Room 4","Room 5","Room 6"),values=cbPalette2) +
+  theme_bw() +
+  theme(legend.position = c(0.25,0.67),legend.text.align = 0) +
+  theme(legend.title = element_blank()) +
+  theme(legend.key = element_blank()) +
+  theme(text = element_text(size=font.size)) +
+  theme(legend.key.height=unit(1,"line")) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_text(size = font.size, vjust=0.3)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + guides(color=FALSE)
+
+p3 = ggplot() +
+  geom_line(data = data.attrib, aes(x = Date, y = LA/Leafmass, group = as.factor(Room), colour=as.factor(Room))) +
+  geom_point(size=2) +
+  ylab(expression(SLA~(m^{2}~g~C^{-1}))) + 
+  # annotate("text", x = min(shift.output.Mleaf$Date), y = max(shift.output.Mleaf$value), size = font.size, label = paste(title[7])) +
+  scale_colour_manual(breaks=c("1","2","3","4","5","6"),labels=c("Room 1","Room 2","Room 3","Room 4","Room 5","Room 6"),values=cbPalette2) +
+  theme_bw() +
+  theme(legend.position = c(0.25,0.67),legend.text.align = 0) +
+  theme(legend.title = element_blank()) +
+  theme(legend.key = element_blank()) +
+  theme(text = element_text(size=font.size)) +
+  theme(legend.key.height=unit(1,"line")) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_text(size = font.size, vjust=0.3)) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + guides(color=FALSE)
+
+png("output/1.Figure_modelled_sla_great.png", units="px", width=2000, height=700, res=200)
+# print (do.call(grid.arrange,  p))
+grid.arrange(p1, p2, p3, ncol=3)
 dev.off()
 
 ##################------------------------------
