@@ -1,0 +1,22 @@
+Stemmass models:
+----------------
+### Linear regression ignoring temperature variation:
+### Linear regression considering interaction with temperature:### Comparison between both models:
+
+
+Rootmass models:
+----------------
+### Linear regression ignoring temperature variation:
+### Linear regression considering interaction with temperature:### Comparison between both models:
+
+
+Leafmass models:
+----------------
+### Linear regression ignoring temperature variation:
+### Linear regression considering interaction with temperature:### Comparison between both models:
+
+
+Leafarea models:
+----------------
+### Linear regression ignoring temperature variation:
+### Linear regression considering interaction with temperature:### Comparison between both models:

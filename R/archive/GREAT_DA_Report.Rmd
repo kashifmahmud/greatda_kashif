@@ -1,0 +1,62 @@
+---
+title: "Temperature response of growth-GREAT Experiment"
+author: "Dushan Kumarathunge"
+date: "16 April 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r, warning=F, message=F,echo = F}
+library(plantecophys)
+library(doBy)
+library(plotBy)
+library(RColorBrewer)
+
+source("R/functions_for_analysis.R")
+source("R/generic_functions.R")
+source("R/GREAT_functions.R")
+
+```
+
+
+
+## Introduction
+
+Many models use static temperature responses of photosynthesis and respiration (Lombardozzi et al., 2015) and the growth is modelled as the balance  between these two processes. However, recent research suggested that these assumptions used in current PBMs are questionable (Cunningham and Read, 2002, Cunningham and Read, 2003) as plants have the capacity for thermal acclimation. Further, the drivers of temperature-growth response are not well understood. In this research, our aim is to improve the current understanding of the temperature response of growth by identifying the important drivers that account for the overall response
+
+
+## Objectives
+
+Investigate how well a model incorporating temperature responses of photosynthesis and respiration can predict the temperature response of growth
+
+1. What are the key processes contributing to the temperature effect on growth?
+2. Using a carbon balance model, can we simulate growth as a function of photosynthesis and respiration?
+
+
+## Experimental details
+Three provenances of Eucalyptus tereticornis were grown under 6 temperature regimes in the S39 glasshouse from 7 Jan 2016 through 7 Mar 2016.
+The three provenances were from the southern (cold), central and nothers (warm) ends of the distribution. All plants were kept "well-watered" apart from warm-edge provenance, which was subject to a water limitation sub-experiment. Differential watering began after one week of starting the temperature treatments. 
+
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+##### Briefly describe the Carbon Balance Model (CBM)    
+
+DA-modelling framework; similar to that used by  Mahmud et al. (in review). This approach uses a simple carbon balance model shown in **Figure 1**. The model is driven by daily inputs of gross primary production (GPP). Total maintenance respiration (R~m,tot~) is immediately subtracted, and the remainder enters a non-structural C pool (C~n~). This pool is utilized for growth at a rate *k*. Of the utilization flux, a fraction *Y* is used in growth respiration (R~g~), and the remaining fraction (1-*Y*) is allocated to structural C pools (C~s~): among foliage, wood and root (C~s,f~, C~s,w~, C~s,r~).  We assumed there is no leaf, wood or root turnover.   
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/Figure_1_CBM_great.png")
+grid::grid.raster(img)
+```
+
+**Figure 1**: Structure of the Carbon Balance Model (CBM). Pools, shown as solid boxes: C~n~, non-structural storage C; C~s,f~, structural C in foliage; C~s,r~, structural C in roots; C~s,w~, structural C in wood. Fluxes, denoted by arrows, include: GPP, gross primary production; R~m,tot~, maintenance respiration; Rg, growth respiration. Fluxes are governed by five key parameters: *k*, storage utilization coefficient; *Y*, growth respiration fraction; *a~f~*, allocation to foliage; *a~w~*, allocation to wood; $a_r = (1-a_f-a_w)$, allocation to roots; *s~f~*    
+
+

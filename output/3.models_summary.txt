@@ -1,0 +1,50 @@
+Stemmass models:
+Combined linear regression model:
+log(Stemmass) =  -7.654392 + 1.004096 * log(Diameter) + 1.656301 * log(Height)
+
+Individual linear regression models:
+Room #  1 : log(Stemmass) =  -7.98447 + 0.8848862 * log(Diameter) + 1.808967 * log(Height)
+Room #  2 : log(Stemmass) =  -7.616331 + 0.9077209 * log(Diameter) + 1.670993 * log(Height)
+Room #  3 : log(Stemmass) =  -6.825452 + 1.385494 * log(Diameter) + 1.295849 * log(Height)
+Room #  4 : log(Stemmass) =  -7.740351 + 1.208619 * log(Diameter) + 1.575319 * log(Height)
+Room #  5 : log(Stemmass) =  -7.384527 + 1.315544 * log(Diameter) + 1.484582 * log(Height)
+Room #  6 : log(Stemmass) =  -7.314747 + 1.531203 * log(Diameter) + 1.442712 * log(Height)
+
+
+Rootmass models:
+Combined linear regression model:
+log(Rootmass) =  -2.702342 + 2.003655 * log(Diameter) + -0.03520146 * log(Height)
+
+Individual linear regression models:
+Room #  1 : log(Rootmass) =  -3.558372 + 1.272291 * log(Diameter) + 0.5057835 * log(Height)
+Room #  2 : log(Rootmass) =  -3.931875 + 1.373557 * log(Diameter) + 0.5331792 * log(Height)
+Room #  3 : log(Rootmass) =  -4.201466 + 1.204989 * log(Diameter) + 0.6663013 * log(Height)
+Room #  4 : log(Rootmass) =  -4.510758 + 1.656812 * log(Diameter) + 0.5254173 * log(Height)
+Room #  5 : log(Rootmass) =  -6.331518 + 1.398008 * log(Diameter) + 1.035141 * log(Height)
+Room #  6 : log(Rootmass) =  -7.493052 + 0.688722 * log(Diameter) + 1.508475 * log(Height)
+
+
+Leafmass models:
+Combined linear regression model:
+log(Leafmass) =  -4.016038 + 1.436884 * log(Diameter) + 0.7576004 * log(Height)
+
+Individual linear regression models:
+Room #  1 : log(Leafmass) =  -5.696839 + 0.5711722 * log(Diameter) + 1.554743 * log(Height)
+Room #  2 : log(Leafmass) =  -3.73654 + 1.587463 * log(Diameter) + 0.6197549 * log(Height)
+Room #  3 : log(Leafmass) =  -3.155712 + 1.672718 * log(Diameter) + 0.469942 * log(Height)
+Room #  4 : log(Leafmass) =  -4.552893 + 1.226097 * log(Diameter) + 0.968829 * log(Height)
+Room #  5 : log(Leafmass) =  -4.283562 + 1.367188 * log(Diameter) + 0.8435503 * log(Height)
+Room #  6 : log(Leafmass) =  -4.842352 + 1.600092 * log(Diameter) + 0.8994491 * log(Height)
+
+
+Leafarea models:
+Combined linear regression model:
+log(Leafarea) =  1.448205 + 1.496955 * log(Diameter) + 0.7320643 * log(Height)
+
+Individual linear regression models:
+Room #  1 : log(Leafarea) =  -0.3854356 + 1.116982 * log(Diameter) + 1.409323 * log(Height)
+Room #  2 : log(Leafarea) =  1.225156 + 1.452754 * log(Diameter) + 0.8263665 * log(Height)
+Room #  3 : log(Leafarea) =  2.228769 + 1.412524 * log(Diameter) + 0.579906 * log(Height)
+Room #  4 : log(Leafarea) =  1.11733 + 1.14052 * log(Diameter) + 0.9485544 * log(Height)
+Room #  5 : log(Leafarea) =  -0.3311742 + 0.9868362 * log(Diameter) + 1.325821 * log(Height)
+Room #  6 : log(Leafarea) =  0.02393879 + 1.112786 * log(Diameter) + 1.180712 * log(Height)

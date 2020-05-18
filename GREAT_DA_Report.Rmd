@@ -1,0 +1,313 @@
+---
+title: "Temperature response of growth-GREAT Experiment"
+author: "Dushan Kumarathunge"
+date: "16 April 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r, warning=F, message=F,echo = F}
+library(plantecophys)
+library(doBy)
+library(plotBy)
+library(RColorBrewer)
+
+source("R/functions/functions_for_analysis.R")
+source("R/functions/generic_functions.R")
+source("R/functions/GREAT_functions.R")
+
+```
+
+
+
+## Introduction
+
+Many GVMs models use static temperature responses of photosynthesis and respiration (Lombardozzi et al., 2015) and the growth is modelled as the balance  between these two processes. However, recent research suggested that these assumptions used in current PBMs are questionable (Cunningham and Read, 2002, Cunningham and Read, 2003) as plants have the capacity for thermal acclimation. Further, the drivers of temperature-growth response are not well understood. In this research, our aim is to improve the current understanding of the temperature response of growth by identifying the important drivers that account for the overall response
+
+
+## Objectives
+
+Investigate how well a model incorporating temperature responses of photosynthesis and respiration can predict the temperature response of growth
+
+1. What are the key processes contributing to the temperature effect on growth?
+2. Using a carbon balance model, can we simulate growth as a function of photosynthesis and respiration?
+
+
+## Experimental details
+Three provenances of Eucalyptus tereticornis were grown under 6 temperature regimes in the S39 glasshouse from 7 Jan 2016 through 7 Mar 2016.
+The three provenances were from the southern (cold), central and nothers (warm) ends of the distribution. All plants were kept "well-watered" apart from warm-edge provenance, which was subject to a water limitation sub-experiment. Differential watering began after one week of starting the temperature treatments. 
+
+## Data 
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+
+table1 <- read.csv("Parameters/data_census.csv")
+
+knitr::kable(table1, "html") %>%
+  kableExtra::kable_styling(bootstrap_options = c("hover"))
+```
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/great_data_census.png")
+grid::grid.raster(img)
+```
+
+**Figure 1**. Data census of the GREAT experiment
+
+
+##### Briefly describe the Carbon Balance Model (CBM)    
+DA-modelling framework; similar to that used by  Mahmud et al. (in review). This approach uses a simple carbon balance model shown in **Figure 1**. The model is driven by daily inputs of gross primary production (GPP). Total maintenance respiration (R~m,tot~) is immediately subtracted, and the remainder enters a non-structural C pool (C~n~). This pool is utilized for growth at a rate *k*. Of the utilization flux, a fraction *Y* is used in growth respiration (R~g~), and the remaining fraction (1-*Y*) is allocated to structural C pools (C~s~): among foliage, wood and root (C~s,f~, C~s,w~, C~s,r~).  We assumed there is no leaf, wood or root turnover.
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/Figure_1_CBM_great.png")
+grid::grid.raster(img)
+```
+
+**Figure 2**: Structure of the Carbon Balance Model (CBM). Pools, shown as solid boxes: C~n~, non-structural storage C; C~s,f~, structural C in foliage; C~s,r~, structural C in roots; C~s,w~, structural C in wood. Fluxes, denoted by arrows, include: GPP, gross primary production; R~m,tot~, maintenance respiration; Rg, growth respiration. Fluxes are governed by five key parameters: *k*, storage utilization coefficient; *Y*, growth respiration fraction; *a~f~*, allocation to foliage; *a~w~*, allocation to wood; $a_r = (1-a_f-a_w)$, allocation to roots.
+
+
+The dynamics of the four carbon pools (C~n~, C~s,f~, C~s,w~, and C~s,r~) are described by four difference equations:   
+
+Eqn 1 $$\Delta C_n = GPP - R_{m,tot} - kC_n$$ Eqn 2  $$\Delta C_{s,f} = kC_n(1-Y)a_f$$ Eqn 3  $$\Delta C_{s,w} = kC_n(1-Y)a_w$$ Eqn 4   $$\Delta C_{s,r} = kC_n(1-Y)(1-a_f-a_w)$$   
+
+## 1. Estimation of daily total GPP 
+
+We calculated daily total carbon gain ($C_{Day}$) of seedlings for each growth temperature as Eqn 5 $$C_{Day} = L_{A}\sigma A_{Day}$$ 
+where, $L_{A}$ is the total seedling leaf area (m^2^), \sigma is the self shading factor (described later) and $A_{Day}$ is the daily total C assimilation per unit leaf area. We used a coupled photosynthesis stomatal conductance model within the **plantecophys** R package (Duursma, 2015) to 
+estimate $A_{Day}$. Following section describe the parameterization of the coupled photosynthesis stomatal conductance model
+
+
+## Parameter estimation for the coupled photosynthesis stomatal conductance model
+
+### 1. Estimation of Vcmax (at 25^o^C), Jmax (at 25^o^C), $\alpha$ (quantum yield of electron transport) and $\theta$ (curvature of the light response curve)
+
+Measured ACi curves only available for three growth temperatures only (18^o^C, 28.5^o^C and 35.5^o^C). Both Vcmax and Jmax (at 25^o^C) showed a decrease with increasing growth temperatures. It is not clear how to estimate the Vcmax and Jmax for other growth temperatures (use a smooth curve/assume similar values to close growth temperatures ect..). Also, preliminary analysis suggested that leaf scale net photosynthesis rates increased with time in room 1 (18 ^o^C) grown plants, but others, it decreased (due to sink limitation ??) (see Fig 3). Therefore, Both Vcmax and Jmax need to vary over time. As ACi data available only at a single time point, we optimized the Vcmax and Jmax along with $\alpha$ and $\theta$ to fit for the measured photosynthesis data at two different time points (campaign 1; 26 DAP and campaign 3 (46 DAP)). We used non linera regression to optimize parameters. Then we defined the time course of Vcmax and Jmax as follows (Fig 4).
+
+1.	Jan-07 to Feb 02 -> numbers similar to Feb 3 estimates
+2.	Feb-04 to Feb-25 -> linear decrease between two dates
+3.	Feb-26 to Feb-29 -> numbers similar to Feb 26 estimates
+4.	Jmax:Vcmax ratio (at 25^o^C) assumed to be fixed over time.
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/photo_three_campaigns.png")
+grid::grid.raster(img)
+```
+
+Fig.3 Photosynthesis vs Temperature relationship of seedlings with different age. Circles: 26 DAP (3-Feb-2016), diamonds: 40 DAP and squares: ~50 DAP (26-Feb-2016). Colours depict different growth temperatures. Data used: in-situ Asat measurements of well-watered seedlings.
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/vcmax_jmax.png")
+grid::grid.raster(img)
+```
+
+Fig.4 Vcmax and Jmax at 25^o^C over the experiment period. 
+
+
+### 2. g1 
+We fitted Medlyn et al., (2011) stomatal conductance model to estimate g1 parameter. (Assumed g0 = 0). Parameter values for each growth treatment are given in table 2. 
+
+
+### 3. Temperature response parameters of Vcmax and Jmax (avtivation energy ($E_{a}$) and entropy terms ($\Delta S$))
+
+We fitted peaked Arrhenius function for apperent Vcmax and Jmax values derived from fitting ACi curves. As ACi data not available for room 2,3 and 5 we assumed similar parameters for closeby rooms as Room 1 (18^o^C) for Room 2 (21.5^o^C), Room 4 (28.5^o^C) for rooms 3 (25^o^C), Room 6 (35.5^o^C) for room 5 (32.5^o^C).  
+
+### Table 3. Parameters used to predict $A_{Day}$ (Eqn 5) using the coupled photosynthesis stomatal conductance model
+
+```{r, warning=F, message=F,echo = F,eval=T}
+
+table1 <- read.csv("Parameters/great_alpha_vcmax_jmax_25_table.csv")
+knitr::kable(table1, "html") %>%
+kableExtra::kable_styling(bootstrap_options = c("hover"))
+```
+
+Ok. now we have all the parameters required by the photosynthesis model. We first used the model to predict leaf net photosynthesis measured at 4 light levels to confirm tht model performs well in all light levels (low vs high). 
+
+Input met data: Measured LICOR variables (CO2S, VpdL, PARi) 
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/model_testing.png")
+grid::grid.raster(img)
+```
+
+Figure 5. Measured and modelled photosynthesis. The red line is the regression fit (slope=0.9; R2=0.90)
+
+Modelled photosynthesis showed a close fit to the measured and no systematic pattern in residuals (calculated as ($A_{predicted}$-$A_{measured}$/$A_{measured}$)) at any light level. 
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## Estimation of daily carbon gain for six growth temperature treatments
+
+### Daily GPP
+
+We estimated  GPP (gm^2) for every 15 min interval using 15 min met data (air temperature, PAR and VPD) and treatment-specific photosynthetic parameters for each growth temperature treatments and then summed for 24h. We assumed Rday=0 in GPP estimation but it was considered in daily leaf dark respiration estimation (described bellow). Met data not available for two days, 2016/01/20 and 21 (ratation dates). We assumed GPP of 2016-01-18 for this two days as the PAR similar in these three days. 
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/daily_carbon.png")
+grid::grid.raster(img)
+```
+
+
+Figure 6. Modelled daily GPP for each growth temperature over experimental period 
+
+
+
+### Diurnal variation of modelled GPP 
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/daily_carbon_sunny_day.png")
+grid::grid.raster(img)
+```
+
+
+Figure 7. Diurnal variation of modelled  GPP for each growth temperature in a sunny day
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/daily_carbon_cloudy_day.png")
+grid::grid.raster(img)
+```
+
+
+Figure 8. Diurnal variation of modelled  GPP for each growth temperature in a cloudy day
+
+
+### Daily leaf ($R_{m(l)}$), stem ($R_{m(s)}$) and root ($R_{m(r)}$) maintenance respiration
+
+We used leaf, stem and root dark respiration rates (at 25^o^C) measured at final harvest to calculate daily respiration rate for each growth temperature treatment. We assumed common Q10 for the three organs which derived by fitting short-term temperature response for leaf respiration (Drake et al., 2017).
+
+For day time leaf respiration, we used estimated day respiration rates from ACi curve fitting. Data available only for Room 1, 4 and 6. For orher rooms, a smooth curve was used to estimate values. Q10=0.7 (mean across rooms)
+
+**Leaf respiration calculated for day and night seperately.**
+
+**Stem and root respiration rates were assumed similar during day and night**
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/leaf_r_day_vs_night.png")
+grid::grid.raster(img)
+```
+
+Figure 9.a Estimated daily leaf maintenance respiration rates during day and night (at 25^0^C)
+
+
+Similar to GPP, leaf, stem and root respiration rates (gC gC^-1) were estimated at 15 min interval using air temperature data of each temperature treatment, then multiplied by tissue specific mass to estimate the total respiration (gC) and summed for 24h. We assumed $R_{light}$:$R_{dark}$ as 0.7 when estimating $R_{m(l)}$.  
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/leaf_respiration.png")
+grid::grid.raster(img)
+```
+
+Figure 9.b Estimated daily leaf maintenance respiration over the experiment period
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/stem_root_respiration.png")
+grid::grid.raster(img)
+```
+
+Figure 9.c Estimated daily stem and root maintenance respiration over the experiment period
+
+
+## Carbon balance 
+
+Just to check whether plants have enough carbon to support growth and respiration. Assuming $GPP$=$R_{m(l)}$+$R_{m(s)}$+$R_{m(r)}$+ 1.3$\Delta$Biomass
+where, $\Delta$Biomass is $Mass_{final}$-$Mass_{initial}$
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/carbon_balance.png")
+grid::grid.raster(img)
+```
+
+Figure 10. Estimated total GPP and total carbon use of seedlings of GREAT experiment
+
+**Not enough carbon to support growth and respiration at higher two temperatures.**
+
+Possible reasons
+
+1. Carbon balance approach we used assumed growth respiration = 30% of the biomass. This may not a fix parameter
+2. Uncertainities in leaf, stem and root mass estimation. (affect maintenance respiration estimates): A sharp increase in total respiration,
+specially at hotter rooms can be seen in Figure 9. 
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Apply Data Assimilation (DA) with the estimates of GREAT carbon pools and fluxes 
+
+We plan to estimate five parameters (*k*, *Y*, *a~f~*, *a~w~*, *a~r~*) of the CBM for this experiment using GPP and maintenance respiration rates estimated as described above
+
+
+### 1. Test the model for six treatments 
+
+#### parameter settings: Linear   
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/parameters.png")
+grid::grid.raster(img)
+```
+
+Figure 11. Modelled parameters 
+
+
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/data.png")
+grid::grid.raster(img)
+```
+
+Figure 12. Modelled Biomass 
+
+
+<!-- #### parameter settings: Quadratic -->
+
+```{r, warning=F, message=F,echo = F,eval=T}
+img <- png::readPNG("output/NSC_data.png")
+grid::grid.raster(img)
+```
+
+Figure 12. NSC in different tissues
+
+
+<!-- Figure 13. Modelled parameters -->
+
+
+<!-- ```{r, warning=F, message=F,echo = F,eval=T} -->
+<!-- img <- png::readPNG("output/modelled_biomass_Figure_quad.png") -->
+<!-- grid::grid.raster(img) -->
+<!-- ``` -->
+
+<!-- Figure 14. Modelled Biomass (Y-axis in log scale) -->
+
+
+#### Model comparison (linear vs quadratic): BIC values
+
+```{r, warning=F, message=F,echo = F,eval=T}
+
+table4 <- read.csv("Parameters/bic_model_testing.csv")
+
+knitr::kable(table4, "html") %>%
+  kableExtra::kable_styling(bootstrap_options = c("hover"))
+```
+
+
+<!-- ####  -->
+
+
+<!-- ```{r, warning=F, message=F,echo = F,eval=T} -->
+<!-- img <- png::readPNG("output/modelled_parameters_Figure.png") -->
+<!-- grid::grid.raster(img) -->
+<!-- ``` -->
+
+
+<!-- ```{r, warning=F, message=F,echo = F,eval=T} -->
+<!-- img <- png::readPNG("output/modelled_biomass_Figure.png") -->
+<!-- grid::grid.raster(img) -->
+<!-- ``` -->
+

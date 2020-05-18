@@ -1,0 +1,10 @@
+Index,Data,Date of measurement,Used to estimate 
+1,"Photosynthesis at 4 light levels  (100,500,1000,1500) – 8 replicates per provenance per room",2016/01/02 and 03 (26 ADP),"g1, alpha, Vcmax and Jmax at 25C"
+2,"Photosynthesis at 2 light levels (100, 1500) – only room 2 plants – moved to other rooms and measured",5/01/2016 (28 DAP),g1 (not used for further analysis)
+3,Rdark – T curves: only room 2 plants - moved to other rooms and measured (),11/01/2016 (34 DAP),Q10 for leaf respiration
+4,"ACi-T curves - Warm and Cool prov. Only
+Three rooms 18, 28.5 and 35.5 - six replicates per provenance per room
+",2016/01/16 – 26 (40-48 DAP),"Ea of Vcmax nad Jmax, ?S of Vcmax and Jmax, JV ratio at 25C"
+5,"Photosynthesis at 4 light levels  (100,500,1000,1500) –  One prov. - Insitu - ",26/01/2016 (48 DAP),"Vcmax, Jmax at 25C, alpha, theta  "
+6,"Respiration components (leaf, stem, roots) – measured at 25C five replicates per provenance per room",2016/01/17 - 24 (final harvest),"Respiration rates of leaf, stem and roots at growth temperatures"
+7,Met Data,"15 min VPD, Tair and PPFD measured in each glasshouse room",
