@@ -1,3 +1,6 @@
+# Assign treatment groups
+treat.group = unique(as.factor(data.all$Room)) # Assign all treatments
+
 # Calculate SLA from data
 sla = data.frame(matrix(ncol = 2, nrow = length(treat.group)))
 names(sla) = c("sla","sla.harvest")
