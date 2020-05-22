@@ -25,9 +25,9 @@ for (v in 1:length(treat.group)) {
   }
 }
 
-data.set.final.melt = melt(data.set.final[,c("Date","Room","sla")], id.vars=c("Room","Date"))
+data.set.final.melt = reshape2::melt(data.set.final[,c("Date","Room","sla")], id.vars=c("Room","Date"))
 names(data.set.final.melt)[4] = c("sla")
-sla.melted.error = melt(data.set.final[,c("Date","Room","sla_SE")], id.vars=c("Room","Date"))
+sla.melted.error = reshape2::melt(data.set.final[,c("Date","Room","sla_SE")], id.vars=c("Room","Date"))
 names(sla.melted.error)[4] = c("sla_SE")
 
 data.set.final.melt = merge(data.set.final.melt[,c("Date","Room","sla")],sla.melted.error[,c("Date","Room","sla_SE")], by=c("Room","Date"))

@@ -59,7 +59,7 @@ logLikelihood.great.final <- function (no.param.per.var,data.set,output,with.sto
 #-------------------------------------------------------------------------------------
 mcmc.great <- function(chainLength, no.param.per.var, treat.group, with.storage, model.comparison, model.optimization) {
   
-  source("R/DA_model_functions/load_packages_great.R")
+  source("R/load_packages_great.R")
   
   # Assign inputs for MCMC
   bunr_in = chainLength * 0.1 # Discard the first 10% iterations for Burn-IN in MCMC (According to Oijen, 2008)
@@ -84,8 +84,8 @@ mcmc.great <- function(chainLength, no.param.per.var, treat.group, with.storage,
   
   q = 0 # Indicates the iteration number
   # set.seed(3)
-  # set.seed(50) # final seed for reproducible results
-  # set.seed(50) 
+  # set.seed(15) # final seed for reproducible results
+  # set.seed(18) 
   
   # Start the iteration for different treatment group and number of parameters
   for (v in 1:length(treat.group)) {
@@ -105,7 +105,7 @@ mcmc.great <- function(chainLength, no.param.per.var, treat.group, with.storage,
       
       if (no.param.per.var < 5) {
         # This script initializes the parameter setting
-        source("R/DA_model_functions/parameter_setting_great.R", local=TRUE) # initialize parameters
+        source("R/parameter_setting_great.R", local=TRUE) # initialize parameters
         
       } else { # no.param.per.var > 5; weekly parameter setting) 
         j = c()
@@ -630,9 +630,9 @@ mcmc.great <- function(chainLength, no.param.per.var, treat.group, with.storage,
       # Measured (data) vs Modelled Plant Carbon pools for plotting and comparison
       output.final$Date = data.set$Date
       if (with.storage==T) { 
-        names(output.final) = c("Cstorage.modelled","Mleaf.modelled","Mwood.modelled","Mroot.modelled","Rm","Sleaf.modelled","Swood.modelled","Sroot.modelled","Date")
+        names(output.final) = c("Cstorage.modelled","Mleaf.modelled","Mwood.modelled","Mroot.modelled","Rm","Date")
         melted.output = melt(output.final[,c("Mleaf.modelled","Mwood.modelled","Mroot.modelled","Rm","Date")], id.vars="Date")
-        melted.Cstorage = output.final[,c("Cstorage.modelled","Sleaf.modelled","Swood.modelled","Sroot.modelled","Date")]
+        melted.Cstorage = output.final[,c("Cstorage.modelled","Date")]
         melted.data = melt(data.set[ , c("LM","WM","RM","Date")], id.vars="Date")
         melted.error = melt(data.set[ , c("LM_SE","WM_SE","RM_SE","Date")], id.vars="Date")
         melted.Cstorage$Date = as.Date(melted.Cstorage$Date)
@@ -842,7 +842,7 @@ model <- function (no.param,data.set,Y,k,af,as) {
     Mroot[i] <- Croot[i] + Sroot[i]
     
   }
-  output = data.frame(Cstorage,Mleaf,Mwood,Mroot,Rm,Sleaf,Swood,Sroot)
+  output = data.frame(Cstorage,Mleaf,Mwood,Mroot,Rm)
   
   return(output)
 }
@@ -887,7 +887,7 @@ model.monthly <- function (data.set,j,Y,k,af,as) {
     Mwood[i] <- Cwood[i] + Swood[i]
     Mroot[i] <- Croot[i] + Sroot[i]
   }
-  output = data.frame(Cstorage,Mleaf,Mwood,Mroot,Rm,Sleaf,Swood,Sroot)
+  output = data.frame(Cstorage,Mleaf,Mwood,Mroot,Rm)
   
   return(output)
 }
@@ -1239,7 +1239,6 @@ plot.Modelled.parameters.great <- function(result,with.storage,treat.group) {
         scale_y_continuous(limits = c(min(summary.param.set.limit$Parameter)-2*max(summary.param.set.limit$Parameter_SD),
                                       max(summary.param.set.limit$Parameter)+2*max(summary.param.set.limit$Parameter_SD))) +
         annotate("text", x = min(summary.param.set$Date), y = max(summary.param.set$Parameter) + 2*max(summary.param.set$Parameter_SD), size = font.size-7, label = paste(title[p])) +
-       
         theme_bw() +
         theme(legend.title = element_text(colour="black", size=font.size)) +
         theme(legend.text = element_text(colour="black", size=font.size-3)) +
@@ -1307,7 +1306,7 @@ plot.Modelled.parameters.great <- function(result,with.storage,treat.group) {
     }
   }
   
-  png("output/DA_Figures/modelled_parameters_Figure.png", units="px", width=2000, height=2000, res=250)
+  png("output/Figure_4_modelled_parameters.png", units="px", width=2000, height=2000, res=250)
   print (do.call(grid.arrange,  plot))
   dev.off()
 }
@@ -1322,10 +1321,7 @@ plot.Modelled.parameters.great <- function(result,with.storage,treat.group) {
 ################ Figure 5 #####################
 # Plot Daily analysis (lines) with optimum parameter setting and intermittent observations (symbols) of selected carbon stocks
 #-------------------------------------------------------------------------------------
-
-
-plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
-  
+plot.Modelled.biomass.great <- function(result,with.storage,treat.group) { 
   listOfDataFrames <- vector(mode = "list", length = nlevels(treat.group))
   for (i in 1:nlevels(treat.group)) {
     listOfDataFrames[[i]] <- data.frame(result[[i]][[4]])
@@ -1345,9 +1341,9 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
     }
     summary.storage = do.call("rbind", listOfDataFrames)
   }
-  
   cbPalette = c("gray", "skyblue", "orange", "green3", "yellow3", "#0072B2", "#D55E00")
-  
+  # cbPalette = c("darkorange", "cyan", "firebrick", "deepskyblue3")
+  # cbPalette = c("cyan", "darkorange")
   i = 0
   font.size = 10
   plot = list() 
@@ -1389,12 +1385,8 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
         labs(colour="Treatment") +
         scale_color_manual(values=cbPalette[1:6]) +
         # scale_color_manual(labels = c("Individuals", "One Group"), values = c("blue", "red")) +
-        # coord_trans(y = "log10") + 
-        # ylab(paste(as.character(meas[p]),"(g C plant-1)")) +
-       scale_y_continuous(trans = 'log10') +
-        
+        # coord_trans(y = "log10") + ylab(paste(as.character(meas[p]),"(g C plant-1)")) +
         theme_bw() +
-        
         annotate("text", x = max(summary.storage$Date), y = min(summary.storage$Cstorage.modelled), size = font.size-7, label = paste(title[p])) +
         theme(legend.title = element_text(colour="black", size=font.size-2)) +
         theme(legend.text = element_text(colour="black", size = font.size-3)) +
@@ -1421,9 +1413,7 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
         labs(colour="Treatment") +
         scale_color_manual(values=cbPalette[1:6]) +
         # scale_color_manual(labels = c("Individuals", "One Group"), values = c("blue", "red")) +
-        # coord_trans(y = "log10") +
-        # ylab(paste(as.character(meas[p]),"(g C plant-1)")) +
-       scale_y_continuous(trans = 'log10') +
+        # coord_trans(y = "log10") + ylab(paste(as.character(meas[p]),"(g C plant-1)")) +
         theme_bw() +
         annotate("text", x = max(summary.output.Cpool$Date), y = min(summary.output.Cpool$value), size = font.size-7, label = paste(title[p])) +
         # theme(plot.title = element_text(size = 20, face = "bold")) +
@@ -1447,12 +1437,12 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
         # plot[[i]] = plot[[i]] + theme(plot.margin=unit(c(0.4, 0.4, 0.4, 0.75), units="line"))
       } else if (p==3) {
         plot[[i]] = plot[[i]] + ylab(expression(C["t,r"]~"(g C "*plant^"-1"*")"))
-        # } else if (p==4) {
-        #   plot[[i]] = plot[[i]] + ylab(expression(C["f,lit"]~"(g C "*plant^"-1"*")"))
+      # } else if (p==4) {
+      #   plot[[i]] = plot[[i]] + ylab(expression(C["f,lit"]~"(g C "*plant^"-1"*")"))
       } else if (p==4) {
         plot[[i]] = plot[[i]] + ylab(expression(C["n,t"]~"(g C "*plant^"-1"*")"))
       } else {
-        #   plot[[i]] = plot[[i]] + ylab(expression(R[a]~"(g C "*plant^"-1"*")"))
+      #   plot[[i]] = plot[[i]] + ylab(expression(R[a]~"(g C "*plant^"-1"*")"))
       }
     } else {
       if (p==1) {
@@ -1463,10 +1453,10 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
         # plot[[i]] = plot[[i]] + theme(plot.margin=unit(c(0.4, 0.4, 0.4, 0.75), units="line"))
       } else if (p==3) {
         plot[[i]] = plot[[i]] + ylab(expression(C["t,r"]~"(g C "*plant^"-1"*")"))
-        # } else if (p==4) {
-        #   plot[[i]] = plot[[i]] + ylab(expression(C["f,lit"]~"(g C "*plant^"-1"*")"))
-        # } else {
-        #   plot[[i]] = plot[[i]] + ylab(expression(R[a]~"(g C "*plant^"-1"*")"))
+      # } else if (p==4) {
+      #   plot[[i]] = plot[[i]] + ylab(expression(C["f,lit"]~"(g C "*plant^"-1"*")"))
+      # } else {
+      #   plot[[i]] = plot[[i]] + ylab(expression(R[a]~"(g C "*plant^"-1"*")"))
       }
     }
     if (p>1) {
@@ -1500,7 +1490,7 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
     
   }
   
-  png("output/DA_Figures/modelled_biomass_Figure.png", units="px", width=1600, height=1300, res=220)
+  png("output/Figure_5_modelled_biomass.png", units="px", width=1600, height=1300, res=220)
   print (do.call(grid.arrange,  plot))
   dev.off()
   
@@ -1547,6 +1537,7 @@ plot.Modelled.biomass.great <- function(result,with.storage=T,treat.group) {
   # # #----------------------------------------------------------------------------------------------------------------
   
 }
+
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 

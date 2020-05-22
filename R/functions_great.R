@@ -2158,7 +2158,7 @@ plot.SLA <- function(data.attrib.daily, sla.harvest.all, iteration) {
 ################ Figure 6A #####################
 # Function to gerenate plot for Vcmax25 
 plot.Vcmax.Jmax.v1 <- function(data.attrib.daily, iteration) {
-  melt.data = melt(data.attrib.daily[,c("Date","Room","Vcmax25","Jmax25")], id.vars = c("Date","Room"))
+  melt.data = reshape2::melt(data.attrib.daily[,c("Date","Room","Vcmax25","Jmax25")], id.vars = c("Date","Room"))
   ggplot(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
     geom_point(size=0.01) +
     geom_line(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
@@ -2377,7 +2377,7 @@ plot.alpha.theta <- function(light.response, iteration) {
 ################ Figure 6B #####################
 # Function to gerenate plot for Respiration rates
 plot.Rd <- function(data.attrib.daily, iteration) {
-  melt.data = melt(data.attrib.daily[,c("Date","Room","R_leaf","R_stem","R_root")], id.vars = c("Date","Room"))
+  melt.data = reshape2::melt(data.attrib.daily[,c("Date","Room","R_leaf","R_stem","R_root")], id.vars = c("Date","Room"))
   ggplot(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
     geom_point(size=0.01) +
     geom_line(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
@@ -2406,7 +2406,7 @@ plot.Rd <- function(data.attrib.daily, iteration) {
 ################ Figure 6C #####################
 # Function to gerenate plot biomass allocation fractions (af, as, ar)
 plot.allocation.fractions <- function(data.attrib.daily, iteration) {
-  melt.data = melt(data.attrib.daily[,c("Date","Room","af","as","ar")], id.vars = c("Date","Room"))
+  melt.data = reshape2::melt(data.attrib.daily[,c("Date","Room","af","as","ar")], id.vars = c("Date","Room"))
   ggplot(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
     geom_point(size=0.01) +
     geom_line(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
@@ -2769,12 +2769,13 @@ plot.biomass.barplot.rm1to4 <- function(shift.output.bar) {
   # quartz()
   ggplot(shift.output.bar, aes(x=Case, y=biomass, fill = Case)) +
     ylab(expression("Total biomass"~"(g C "*plant^"-1"*")")) + xlab("Attribution cases") + 
-    geom_bar(stat = "identity") + geom_text(aes(label=round(biomass,1)), vjust=-0.25) + 
+    geom_bar(stat = "identity") + geom_text(aes(label=round(biomass,2)), vjust=-0.25) + 
     # scale_fill_manual(values=cbPalette) +
-    scale_fill_manual(breaks=c("0","1","2","3","4","5","6","7","8","9","10","11"),
-                      labels=c(expression(Baseline~(at~18~degree~C)),expression(+ VPD~at~28.5~degree~C),expression(+ Tempearature~at~28.5~degree~C),
+    scale_fill_manual(breaks=c("0","1","2","3","4","5","6","7","8","9","10","11","12"),
+                      labels=c(expression(Baseline~(at~18~degree~C)),expression(+ T[air]~at~28.5~degree~C~"for photosynthesis"),expression(+ VPD~at~28.5~degree~C),
+                               expression(+ T[air]~at~28.5~degree~C~"for respiration"),expression(+ (R[f] + R[s] + R[r])~at~28.5~degree~C),
                                expression(+ V[cmax]~and~J[max]~at~28.5~degree~C),expression(+ E[a]~and~Delta[s]~at~28.5~degree~C),
-                               expression(+ g[1]~at~28.5~degree~C),expression(+ alpha~and~theta~at~28.5~degree~C),expression(+ (R[f] + R[s] + R[r])~at~28.5~degree~C),
+                               expression(+ g[1]~at~28.5~degree~C),expression(+ alpha~and~theta~at~28.5~degree~C),
                                expression(+ SLA~at~28.5~degree~C), expression(+ (a[f] + a[s] + a[r])~at~28.5~degree~C),expression(+ Y~at~28.5~degree~C),expression(+ k~at~28.5~degree~C)),
                       values=cbPalette) +
     theme_bw() +
@@ -2790,13 +2791,14 @@ plot.biomass.barplot.rm1to4 <- function(shift.output.bar) {
 plot.biomass.barplot.rm4to6 <- function(shift.output.bar) { 
   ggplot(shift.output.bar, aes(x=Case, y=biomass, fill = Case)) +
     ylab(expression("Total biomass"~"(g C "*plant^"-1"*")")) + xlab("Attribution cases") + 
-    geom_bar(stat = "identity") + geom_text(aes(label=round(biomass,1)), vjust=-0.25) + 
+    geom_bar(stat = "identity") + geom_text(aes(label=round(biomass,2)), vjust=-0.25) + 
     # scale_fill_manual(values=cbPalette) +
-    scale_fill_manual(breaks=c("0","1","2","3","4","5","6","7","8","9","10","11"),
-                      labels=c(expression(Baseline~(at~28.5~degree~C)),expression(+ VPD~at~35.5~degree~C),expression(+ Tempearature~at~35.5~degree~C),
-                               expression(+ V[cmax]~and~J[max]~at~35.5~degree~C),expression(+ E[a]~and~Delta[s]~at~35.5~degree~C),
-                               expression(+ g[1]~at~35.5~degree~C),expression(+ alpha~and~theta~at~35.5~degree~C),expression(+ (R[f] + R[s] + R[r])~at~35.5~degree~C),
-                               expression(+ SLA~at~35.5~degree~C),expression(+ (a[f] + a[s] + a[r])~at~35.5~degree~C),expression(+ Y~at~35.5~degree~C),expression(+ k~at~35.5~degree~C)),
+    scale_fill_manual(breaks=c("0","1","2","3","4","5","6","7","8","9","10","11","12"),
+                      labels=c(expression(Baseline~(at~18~degree~C)),expression(+ T[air]~at~28.5~degree~C~"for photosynthesis"),expression(+ VPD~at~28.5~degree~C),
+                               expression(+ T[air]~at~28.5~degree~C~"for respiration"),expression(+ (R[f] + R[s] + R[r])~at~28.5~degree~C),
+                               expression(+ V[cmax]~and~J[max]~at~28.5~degree~C),expression(+ E[a]~and~Delta[s]~at~28.5~degree~C),
+                               expression(+ g[1]~at~28.5~degree~C),expression(+ alpha~and~theta~at~28.5~degree~C),
+                               expression(+ SLA~at~28.5~degree~C), expression(+ (a[f] + a[s] + a[r])~at~28.5~degree~C),expression(+ Y~at~28.5~degree~C),expression(+ k~at~28.5~degree~C)),
                       values=cbPalette) +
     theme_bw() +
     theme(legend.position = c(0.7,0.75),legend.text.align = 0) +

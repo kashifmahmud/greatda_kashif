@@ -208,18 +208,22 @@ source("R/C_balance_great.R")
 source("R/sla_great.R")
 
 #-------------------------------------------------------------------------------------
+#### DA with all rooms together
 # Load required libraries and functions in case you clear the workspace after pre-processing
 source("R/functions_great.R")
 source("R/functions_great_CBM.R")
 
 # Assign treatment groups
+data.all = merge(data.gpp, data.biomass, by=c("Date","Room"), all=TRUE) # entire dataset
 treat.group = unique(as.factor(data.all$Room)) # Assign all treatments
-# treat.group = as.factor(c("1","4","6")) # Assign few treatments to check the results
 
 # Data up to the 24th February
 data.all = subset(data.all, Date <= as.Date("2016-02-24"))
 
-# Model run for WTC3 dataset with clustering
+# define DA parameters
+chainLength=5555; no.param.per.var=2; with.storage=T; model.comparison=F; model.optimization=F
+
+# Model run for Great dataset (room 1 to 5) with clustering
 cluster <- makeCluster(detectCores()-1)
 # clusterEvalQ(cluster, library(xts))
 clusterExport(cl=cluster, list("data.all","treat.group","tnc"))
@@ -234,8 +238,8 @@ start <- proc.time() # Start clock
 #                      treat.group=treat.group,
 #                      MoreArgs=list(chainLength=3000))
 result <- clusterMap(cluster, mcmc.great, treat.group=treat.group,
-                     MoreArgs=list(chainLength=11111,with.storage=T, model.comparison=F, 
-                     model.optimization=F, no.param.per.var=2))
+                     MoreArgs=list(chainLength=chainLength,with.storage=with.storage, model.comparison=model.comparison, 
+                     model.optimization=model.optimization, no.param.per.var=no.param.per.var))
 
 time_elapsed_series <- proc.time() - start # End clock
 stopCluster(cluster)
@@ -251,6 +255,84 @@ sum(bic$bic)
 # Plot parameters and biomass data fit
 plot.Modelled.parameters.great(result,with.storage=T,treat.group)
 plot.Modelled.biomass.great(result,with.storage=T,treat.group)
+
+#-------------------------------------------------------------------------------------
+#### DA with separate room 1-5 and 6
+# Load required libraries and functions in case you clear the workspace after pre-processing
+source("R/merge_data_attrib.R")
+
+
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+#### DA with separate room 1-5 and 6
+# Load required libraries and functions in case you clear the workspace after pre-processing
+source("R/functions_great.R")
+source("R/functions_great_CBM.R")
+
+# Assign treatment groups
+data.all = merge(data.gpp, data.biomass, by=c("Date","Room"), all=TRUE) # entire dataset
+
+treat.group.all = unique(as.factor(data.all$Room)) # Assign all treatments
+treat.group = as.factor(c("1","2","3","4","5")) # Assign few treatments to check the results
+treat.group.rm6=6
+
+# Data up to the 24th February
+data.all = subset(data.all, Date <= as.Date("2016-02-24"))
+
+# define DA parameters
+chainLength=5555; no.param.per.var=2; with.storage=T; model.comparison=F; model.optimization=F
+
+# Model run for Great dataset (room 1 to 5) with clustering
+cluster <- makeCluster(detectCores()-1)
+# clusterEvalQ(cluster, library(xts))
+clusterExport(cl=cluster, list("data.all","treat.group","tnc"))
+ex <- Filter(function(x) is.function(get(x, .GlobalEnv)), ls(.GlobalEnv))
+clusterExport(cluster, ex)
+result.cluster = list()
+bic.cluster = list()
+
+start <- proc.time() # Start clock
+# result <- clusterMap(cluster, mcmc.great, with.storage=rep(T,6), model.comparison=rep(F,6), model.optimization=rep(F,6), 
+#                      no.param.par.var=rep(3,6),
+#                      treat.group=treat.group,
+#                      MoreArgs=list(chainLength=3000))
+result <- clusterMap(cluster, mcmc.great, treat.group=treat.group,
+                     MoreArgs=list(chainLength=chainLength,with.storage=with.storage, model.comparison=model.comparison, 
+                                   model.optimization=model.optimization, no.param.per.var=no.param.per.var))
+
+time_elapsed_series <- proc.time() - start # End clock
+stopCluster(cluster)
+
+final.result = c()
+final.result = result
+
+# # Plot parameters and biomass data fit
+# plot.Modelled.parameters.great(final.result,with.storage=T,treat.group)
+# plot.Modelled.biomass.great(final.result,with.storage=T,treat.group)
+
+#-------------------------------------------------------------------------------------
+# run DA for only room 6
+data.all = subset(data.all, Room == 6)
+treat.group.rm6 = 6
+result.rm6 = mcmc.great.rm6(chainLength, no.param.per.var, treat.group.rm6, with.storage, model.comparison, model.optimization) # Linear/Quadratic/Cubic parameters
+final.result[[6]] = result.rm6
+
+listOfDataFrames <- vector(mode = "list", length = nlevels(treat.group))
+for (i in 1:nlevels(treat.group)) {
+  listOfDataFrames[[i]] <- data.frame(final.result[[i]][[6]])
+}
+bic = do.call("rbind", listOfDataFrames)
+write.csv(bic, "output/bic.csv", row.names=FALSE)
+sum(bic$bic)
+
+final.result[[6]][[2]]$treatment = as.factor(final.result[[6]][[2]]$treatment)
+
+# Plot parameters and biomass data fit
+plot.Modelled.parameters.great(final.result,with.storage=T,treat.group.all)
+plot.Modelled.biomass.great(final.result,with.storage=T,treat.group.all)
+
+# plot.Modelled.parameters(result,with.storage=T)
+# plot.Modelled.biomass(result,with.storage=T)
 
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------
