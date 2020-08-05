@@ -6,12 +6,12 @@ names(data.attrib.set.daily) = c("Room","Date","Tgrowth","SLA","LA","LM","SM","R
                                  "Vcmax25","Jmax25","k","Y","af","as","ar","Intercept","Slope","self_s")
 
 
-# adjust the respiration data
-if (data.attrib.set$Room[1] == 1) {
-  c3 = 0.685
-} else {
-  c3 = 0.773705
-}  
+# # adjust the respiration data
+# if (data.attrib.set$Room[1] == 1) {
+#   c3 = 0.685
+# } else {
+#   c3 = 0.773705
+# }  
   
 # plot(data.attrib.set.daily$Date,data.attrib.set.daily$SLA,col='red',type='l')
 # lines(data.attrib.set.daily$Date,data.attrib.set.daily$LA/data.attrib.set.daily$LM,col='green')
@@ -72,11 +72,18 @@ Cstem[1] <- Mstem[1] - Sstem[1]
 Croot[1] <- Mroot[1] - Sroot[1]
 
 # calculate respiration rates
+# met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
+#   with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
+# met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
+#   met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c3) * (15*60) # unit (gC per gC per 15 mins)
+# met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] = 0.7*met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] # 30% reduction in leaf respiration during day time
+
+met.rd.attrib.set.date$Rdtair_leaf = ifelse(met.rd.attrib.set.date$period=="Day",with(check.rd,Rday_leaf*0.7^((Tair-25)/10)*(LA/Leafmass)), 
+                                            with(met.rd.attrib.set.date,R25_leaf*2.1^((Tair-25)/10)))
+met.rd.attrib.set.date[,c("Rdtair_stem","Rdtair_root")] = 
+  with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gC per sec)
 met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-  with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
-met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c3) * (15*60) # unit (gC per gC per 15 mins)
-met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] = 0.7*met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] # 30% reduction in leaf respiration during day time
+  met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (15*60) # unit (gC per gC per 15 mins)
 
 # # Calculate daily mean respiration rates for all tree components by summing all 15-mins data for each day
 # Rd.df <- summaryBy(Rdtair_leaf+Rdtair_stem+Rdtair_root ~ Date+Room, data=met.rd.attrib.set.date, FUN=sum, na.rm=TRUE) # Sum of all same day Rd
@@ -137,11 +144,18 @@ for (i in 2:nrow(data.attrib.set.daily)) {
   GPP[i] <- LA[i] * Cday[i] * M[i] # calculate total daily C gain with self shading in gC d-1 plant-1
   
   # calculate respiration rates
+  met.rd.attrib.set.date$Rdtair_leaf = ifelse(met.rd.attrib.set.date$period=="Day",with(check.rd,Rday_leaf*0.7^((Tair-25)/10)*(LA/Leafmass)), 
+                                              with(met.rd.attrib.set.date,R25_leaf*2.1^((Tair-25)/10)))
+  met.rd.attrib.set.date[,c("Rdtair_stem","Rdtair_root")] = 
+    with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gC per sec)
   met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-    with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
-  met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-  met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c3) * (15*60) # unit (gC per gC per 15 mins)
-  met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] = 0.7*met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] # 30% reduction in leaf respiration during day time
+    met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (15*60) # unit (gC per gC per 15 mins)
+  
+  # met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
+  #   with(met.rd.attrib.set.date, met.rd.attrib.set.date[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
+  # met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
+  # met.rd.attrib.set.date[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c3) * (15*60) # unit (gC per gC per 15 mins)
+  # met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] = 0.7*met.rd.attrib.set.date[met.rd.attrib.set.date$period == "Day","Rdtair_leaf"] # 30% reduction in leaf respiration during day time
   
   # # Calculate daily mean respiration rates for all tree components by summing all 15-mins data for each day
   # Rd.df = c()
@@ -154,10 +168,10 @@ for (i in 2:nrow(data.attrib.set.daily)) {
   #     sum(data.attrib.set.date$R_stem)*Mstem[i]
 }
 
-if (q == 0) {
-  c2 = (output.attrib.set$Mleaf.modelled[i]+output.attrib.set$Mwood.modelled[i]+output.attrib.set$Mroot.modelled[i]) / 
-    (Mleaf[i]+Mstem[i]+Mroot[i])
-}
+# if (q == 0) {
+#   c2 = (output.attrib.set$Mleaf.modelled[i]+output.attrib.set$Mwood.modelled[i]+output.attrib.set$Mroot.modelled[i]) / 
+#     (Mleaf[i]+Mstem[i]+Mroot[i])
+# }
 # if (q > 0) {
 #   if (data.attrib.set$Room[1] == 1) {
 #     c2 = 1.001311
@@ -165,8 +179,31 @@ if (q == 0) {
 #     c2 = 1.259885
 #   }
 # }
-# output.final = data.frame(c2*Cstorage,c2*Mleaf,c2*Mstem,c2*Mroot,c2*Sleaf,c2*A)
-output.final = data.frame(Cstorage,Mleaf,Mstem,Mroot,Sleaf,A)
+# adjust the biomass data
+if (data.attrib.set$Room[1] == 1 && q > 0) {
+  c2 = c2 + ((6.654/5.29)-1)/12
+} else if (data.attrib.set$Room[1] == 4 && q == 0) {
+  c2 = 6.654/5.68
+} else if (data.attrib.set$Room[1] == 4 && q == 1) {
+  c2 = c2
+} else if (data.attrib.set$Room[1] == 4 && q == 2) {
+  c2 = c2
+} else if (data.attrib.set$Room[1] == 4 && q > 2) {
+  c2 = c2 + ((3.2446/2.32)-(6.654/5.68))/10
+}  else {
+  c2 = 1
+}
+# if (data.attrib.set$Room[1] == 1 && q > 0) {
+#   c2 = c2 + ((6.654/5.29)-1)/12
+# } else if (data.attrib.set$Room[1] == 4 && q == 0) {
+#   c2 = 6.654/5.68
+# } else if (data.attrib.set$Room[1] == 4 && q > 0) {
+#   c2 = 3.2446/2.32
+# }  else {
+#   c2 = 1
+# }
+output.final = data.frame(c2*Cstorage,c2*Mleaf,c2*Mstem,c2*Mroot,c2*Sleaf,c2*A)
+# output.final = data.frame(Cstorage,Mleaf,Mstem,Mroot,Sleaf,A)
 
 
 # check on first day GPP for room 1 from Dushan's analysis

@@ -16,7 +16,7 @@ logLikelihood.great <- function (no.param.per.var,data.set,output,with.storage,m
   
   for (i in 1:nrow(data.set)) {
     if (!is.na(data.set$LM[i])) {
-      logLi[i] = - (3*(data_count/sum(!is.na(data.set$LM)))*0.5*((output$Mleaf[i] - data.set$LM[i])/data.set$LM_SE[i])^2 - log(data.set$LM_SE[i]) - log(2*pi)^0.5)
+      logLi[i] = - (5*(data_count/sum(!is.na(data.set$LM)))*0.5*((output$Mleaf[i] - data.set$LM[i])/data.set$LM_SE[i])^2 - log(data.set$LM_SE[i]) - log(2*pi)^0.5)
     }
     if (!is.na(data.set$WM[i])) {
       logLi[i] = logLi[i] - ((data_count/sum(!is.na(data.set$WM)))*0.5*((output$Mwood[i] - data.set$WM[i])/data.set$WM_SE[i])^2 - log(data.set$WM_SE[i]) - log(2*pi)^0.5)

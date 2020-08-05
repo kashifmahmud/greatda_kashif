@@ -2046,7 +2046,7 @@ plot.VPD.v1 <- function(data.attrib.daily, iteration) {
     geom_line(data = data.attrib.daily, aes(x = Date, y = VPD,  group = Room, colour=factor(Room))) +
     ylab(expression(Mean ~ Daily ~ VPD ~ (k ~ Pa))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$VPD)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$VPD), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     # theme(legend.position = c(0.75,0.85),legend.key.height=unit(3,"line")) +
     theme(legend.position = c(0.15,0.4)) + 
@@ -2067,7 +2067,7 @@ plot.VPD.v2 <- function(data.attrib.daily, iteration) {
     geom_line(data = data.attrib.daily, aes(x = Date, y = VPD,  group = Room, colour=factor(Room))) +
     ylab(expression(Mean ~ Daily ~ VPD ~ (k ~ Pa))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$VPD)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$VPD), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     # theme(legend.position = c(0.75,0.85),legend.key.height=unit(3,"line")) +
     theme(legend.position = c(0.5,0.85)) + 
@@ -2088,7 +2088,7 @@ plot.Tair <- function(data.attrib.daily, iteration) {
     geom_line(data = data.attrib.daily, aes(x = Date, y = Tair,  group = Room, colour=factor(Room))) +
     ylab(expression(Mean ~ Daily ~ Tair ~ (degree ~ C))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$Tair)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$Tair), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.55)) +
     theme(legend.title = element_blank()) +
@@ -2106,7 +2106,7 @@ plot.PAR <- function(data.attrib.daily, iteration) {
     geom_line(data = data.attrib.daily, aes(x = Date, y = PAR,  group = Room, colour=factor(Room))) +
     ylab(expression(Mean ~ Daily ~ PAR ~ (mu ~ mol~ m^{-2} ~ s^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$PAR)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$PAR), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.85)) +
     theme(legend.title = element_blank()) +
@@ -2127,7 +2127,7 @@ plot.PAR <- function(data.attrib.daily, iteration) {
 ################ Figure 6B #####################
 # Function to gerenate plot SLA
 pd <- position_dodge(2)
-plot.SLA <- function(data.attrib.daily, sla.harvest.all, iteration) { 
+plot.SLA.v1 <- function(data.attrib.daily, sla.harvest.all, iteration) { 
   ggplot(data = sla.harvest.all, aes(x = Date, y = sla,  group = Room, colour=factor(Room))) +
     # geom_point(position=pd,data = sla.harvest.all, aes(x = Date, y = sla,  group = Room, colour=factor(Room)), size=3, pch=17) +
     # geom_errorbar(position=pd,data = sla.harvest.all, aes(ymin=sla-sla_SE, ymax=sla+sla_SE), colour="grey", width=2) +
@@ -2136,7 +2136,7 @@ plot.SLA <- function(data.attrib.daily, sla.harvest.all, iteration) {
     ylab(expression(SLA ~ (m^{2} ~ gC^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # annotate("text", x = mean(data.attrib.daily$Date), y = min(data.attrib.daily$SLA), size = font.size-4, label = paste("Triangles = Harvest")) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$SLA)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$SLA)*1.12, size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.85,0.85)) +
     theme(legend.title = element_blank()) +
@@ -2148,7 +2148,27 @@ plot.SLA <- function(data.attrib.daily, sla.harvest.all, iteration) {
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     theme(plot.title = element_text(vjust=-2))
 }
-
+plot.SLA.v2 <- function(data.attrib.daily, sla.harvest.all, iteration) { 
+  ggplot(data = sla.harvest.all, aes(x = Date, y = sla,  group = Room, colour=factor(Room))) +
+    # geom_point(position=pd,data = sla.harvest.all, aes(x = Date, y = sla,  group = Room, colour=factor(Room)), size=3, pch=17) +
+    # geom_errorbar(position=pd,data = sla.harvest.all, aes(ymin=sla-sla_SE, ymax=sla+sla_SE), colour="grey", width=2) +
+    geom_point(data = data.attrib.daily, aes(x = Date, y = LA/LM,  group = Room, colour=factor(Room)), size=0.01) +
+    geom_line(data = data.attrib.daily, aes(x = Date, y = LA/LM,  group = Room, colour=factor(Room))) +
+    ylab(expression(SLA ~ (m^{2} ~ gC^{-1}))) +
+    scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
+    # annotate("text", x = mean(data.attrib.daily$Date), y = min(data.attrib.daily$SLA), size = font.size-4, label = paste("Triangles = Harvest")) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$SLA)*1.25, size = font.size-4, label = paste(title[iteration])) +
+    theme_bw() +
+    theme(legend.position = c(0.85,0.85)) +
+    theme(legend.title = element_blank()) +
+    theme(legend.key = element_blank(), plot.margin=unit(c(0.25, 0.25, 0.25, 0.45), units="line")) +
+    theme(text = element_text(size=font.size)) +
+    theme(legend.key.height=unit(0.3,"line")) +
+    # theme(legend.key.width=unit(2,"line")) +
+    theme(axis.title.x = element_blank(), axis.title.y = element_text(size = font.size, vjust=0.3)) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+    theme(plot.title = element_text(vjust=-2))
+}
 #----------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------
 
@@ -2162,10 +2182,10 @@ plot.Vcmax.Jmax.v1 <- function(data.attrib.daily, iteration) {
   ggplot(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
     geom_point(size=0.01) +
     geom_line(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
-    ylab(expression(V[cmax25] ~ and ~ J[max25] ~ (mu ~ mol~ m^{-2} ~ s^{-1}))) +
+    ylab(expression(V[cmax25] ~ and ~ J[max25] ~ (mu~ mol~ m^{-2} ~ s^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(melt.data$Date), y = max(melt.data$value), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.25,0.85)) +
     theme(legend.title = element_blank()) +
@@ -2182,10 +2202,10 @@ plot.Vcmax.Jmax.v2 <- function(data.attrib.daily, iteration) {
   ggplot(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
     geom_point(size=0.01) +
     geom_line(data = melt.data, aes(x = Date, y = value,  group = interaction(Room,variable), colour=factor(Room), linetype=factor(variable))) +
-    ylab(expression(V[cmax25] ~ and ~ J[max25] ~ (mu ~ mol~ m^{-2} ~ s^{-1}))) +
+    ylab(expression(V[cmax25] ~ and ~ J[max25] ~ (mu~ mol~ m^{-2} ~ s^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(melt.data$Date), y = max(melt.data$value), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.25,0.8)) +
     theme(legend.title = element_blank()) +
@@ -2223,7 +2243,7 @@ plot.Ea <- function(Vcmax.response, iteration) {
     ylab(expression(V[cmax] / V[cmax25] )) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(Vcmax.response$tleaf), y = max(Vcmax.response$response), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.75)) +
     theme(legend.title = element_blank()) +
@@ -2271,7 +2291,7 @@ plot.dels <- function(Jmax.response, iteration) {
     ylab(expression(J[max] / J[max25] )) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(Jmax.response$tleaf), y = max(Jmax.response$response), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.75)) +
     theme(legend.title = element_blank()) +
@@ -2316,7 +2336,7 @@ plot.g1 <- function(data.attrib.daily, iteration) {
     geom_line(data = data.attrib.daily, aes(x = Date, y = g1,  group = Room, colour=factor(Room))) +
     ylab(expression(g[1] ~ (kPa^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$g1)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$g1), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.75)) +
     theme(legend.title = element_blank()) +
@@ -2355,7 +2375,7 @@ plot.alpha.theta <- function(light.response, iteration) {
     xlab(expression(PAR ~ (mu ~ mol~ m^{-2} ~ s^{-1}))) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(light.response$PAR), y = max(light.response$response), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.75,0.75)) +
     theme(legend.title = element_blank()) +
@@ -2384,7 +2404,7 @@ plot.Rd <- function(data.attrib.daily, iteration) {
     ylab(expression(R[d]~(g~C~g~C^{-1}~d^{-1}))) + 
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_linetype_manual(name="", breaks=c("4", "6"), labels=c("Temp 25.8 C", "Tem 35.5 C")) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(melt.data$Date), y = max(melt.data$value), size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.8,0.62)) +
     theme(legend.title = element_blank()) +
@@ -2414,7 +2434,7 @@ plot.allocation.fractions <- function(data.attrib.daily, iteration) {
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     scale_linetype_manual(breaks=c("af","as","ar"), labels=c(expression(a[f]),expression(a[w]),expression(a[r])),values=c(19,17,15)) +
     scale_y_continuous(name=expression(Allocations~"(g C "*g^"-1"*" C "*d^"-1"*")"),limits = c(0,0.7), breaks=seq(0,1,0.2)) +
-    # annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*0.98, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(melt.data$Date), y = max(melt.data$value)*1.1, size = font.size-4, label = paste(title[iteration])) +
     theme_bw() +
     theme(legend.position = c(0.65,0.88), legend.direction = "horizontal") +
     theme(legend.title = element_blank()) +
@@ -2444,7 +2464,7 @@ plot.Y <- function(data.attrib.daily, iteration) {
     # ggtitle(paste(title[p],"- Case",iteration,":",as.character(var[p]),"(5L pot -> Free)")) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_y_continuous(limits = c(min(data.attrib.daily$Parameter)*0.95, max(data.attrib.daily$Y)*1.05)) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$Y)*1.04, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$Y), size = font.size-4, label = paste(title[iteration])) +
     ylab(expression(Y~"(g C "*g^"-1"*" C "*d^"-1"*")")) +
     theme_bw() +
     theme(legend.position = c(0.85,0.55)) +
@@ -2475,7 +2495,7 @@ plot.k <- function(data.attrib.daily, iteration) {
     # ggtitle(paste(title[p],"- Case",iteration,":",as.character(var[p]),"(5L pot -> Free)")) +
     scale_colour_manual(name="", breaks=c("1","4","6"), labels=c("Temp 18.5 C","Temp 28.5 C","Tem 35.5 C"), values=cbPalette1) +
     # scale_y_continuous(limits = c(min(summary.param.set$Parameter)*0.95, max(summary.param.set$Parameter)*1.05)) +
-    # annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$k)*1.04, size = font.size, label = paste(title[iteration])) +
+    annotate("text", x = min(data.attrib.daily$Date), y = max(data.attrib.daily$k), size = font.size-4, label = paste(title[iteration])) +
     ylab(expression(k~"(g C "*g^"-1"*" C "*d^"-1"*")")) +
     theme_bw() +
     theme(legend.position = c(0.25,0.2)) +
@@ -2486,7 +2506,7 @@ plot.k <- function(data.attrib.daily, iteration) {
     theme(legend.key.height=unit(0.3,"line")) +
     # theme(legend.key.width=unit(3,"line")) +
     theme(axis.title.x = element_blank(), axis.title.y = element_text(size = font.size, vjust=0.3)) +
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + guides(color=FALSE)
 }
 
 #----------------------------------------------------------------------------------------------------------------
@@ -2794,11 +2814,11 @@ plot.biomass.barplot.rm4to6 <- function(shift.output.bar) {
     geom_bar(stat = "identity") + geom_text(aes(label=round(biomass,2)), vjust=-0.25) + 
     # scale_fill_manual(values=cbPalette) +
     scale_fill_manual(breaks=c("0","1","2","3","4","5","6","7","8","9","10","11","12"),
-                      labels=c(expression(Baseline~(at~18~degree~C)),expression(+ T[air]~at~28.5~degree~C~"for photosynthesis"),expression(+ VPD~at~28.5~degree~C),
-                               expression(+ T[air]~at~28.5~degree~C~"for respiration"),expression(+ (R[f] + R[s] + R[r])~at~28.5~degree~C),
-                               expression(+ V[cmax]~and~J[max]~at~28.5~degree~C),expression(+ E[a]~and~Delta[s]~at~28.5~degree~C),
-                               expression(+ g[1]~at~28.5~degree~C),expression(+ alpha~and~theta~at~28.5~degree~C),
-                               expression(+ SLA~at~28.5~degree~C), expression(+ (a[f] + a[s] + a[r])~at~28.5~degree~C),expression(+ Y~at~28.5~degree~C),expression(+ k~at~28.5~degree~C)),
+                      labels=c(expression(Baseline~(at~28.5~degree~C)),expression(+ T[air]~at~35.5~degree~C~"for photosynthesis"),expression(+ VPD~at~35.5~degree~C),
+                               expression(+ T[air]~at~35.5~degree~C~"for respiration"),expression(+ (R[f] + R[s] + R[r])~at~35.5~degree~C),
+                               expression(+ V[cmax]~and~J[max]~at~35.5~degree~C),expression(+ E[a]~and~Delta[s]~at~35.5~degree~C),
+                               expression(+ g[1]~at~35.5~degree~C),expression(+ alpha~and~theta~at~35.5~degree~C),
+                               expression(+ SLA~at~35.5~degree~C), expression(+ (a[f] + a[s] + a[r])~at~35.5~degree~C),expression(+ Y~at~35.5~degree~C),expression(+ k~at~35.5~degree~C)),
                       values=cbPalette) +
     theme_bw() +
     theme(legend.position = c(0.7,0.75),legend.text.align = 0) +

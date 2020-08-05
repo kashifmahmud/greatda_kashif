@@ -6,37 +6,47 @@ source("R/functions_great.R")
 source("R/functions_great_CBM.R")	
 
 # Read tree attributes data including Met data, Temperature dependant variables, Modelled Parameters from Dushan's analysis 
-data.attrib <- read.csv("parameters/data_for_attribution_analysis_v2.csv")
-data.attrib$Tgrowth[data.attrib$Tgrowth == 25.8] = 28.5 #correction to temperature from 25.8 to 28.5 
+# data.attrib <- read.csv("Parameters/data_for_attribution_analysis_v2.csv")
+# data.attrib$Tgrowth[data.attrib$Tgrowth == 25.8] = 28.5 #correction to temperature from 25.8 to 28.5 
+# data.attrib$Date = as.Date(data.attrib$Date, format="%d/%m/%Y")
 
-# # calculate respiration rates
-# data.attrib[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-#   with(data.attrib, data.attrib[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
-# data.attrib[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-#   data.attrib[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c1) # unit (gC per gC per sec)
+data.attrib <- read.csv("Parameters/data.attrib.merged.csv")
+data.attrib$Date = as.Date(data.attrib$Date)
+data.attrib$DateTime_hr = as.POSIXct(as.character(data.attrib$DateTime_hr), format="%Y-%m-%d %H:%M:%S")
 
-# data.attrib_v0 <- read.csv("parameters/data_for_attribution_analysis.csv")
-data.attrib$Date = as.Date(data.attrib$Date, format="%d/%m/%Y")
-# data.attrib$Date = as.Date(data.attrib$Date)
 data.attrib$biomass = data.attrib$Leafmass + data.attrib$Stemmass + data.attrib$Rootmass
 data.attrib$Intercept = mean(data.attrib$Intercept)
 data.attrib$Slope = mean(data.attrib$Slope)
 # data.attrib$SLA = mean(data.attrib$SLA)
 
-# Read Rd at 25C from Dushan's analysis (Unit = gC per gDM per sec)
+# Read Rd at 25C from Dushan's analysis (Unit = gC per gC per sec)
 Rd.attrib <- read.csv("parameters/Rd_data_for_attribution_analysis.csv")
 names(Rd.attrib) = c("Room","R25_leaf","R25_root","R25_stem","R25_leaf_SE","R25_root_SE","R25_stem_SE")
-met.rd.attrib = merge(data.attrib[,c("Date","Room","Tair","DateTime_hr","period")],Rd.attrib, by="Room")
 
+# Read Rday at 25C from Dushan's analysis (Unit = mumol m-2 s-1)
+Rday.attrib <- read.csv("parameters/Rday_aci_fits.csv")
+keeps = c("Room", "Rd.mean")
+Rday.attrib = Rday.attrib[ , keeps, drop = FALSE]
+names(Rday.attrib) = c("Room","Rday_leaf")
+Rday.attrib$Rday_leaf = Rday.attrib$Rday_leaf*10^-6*12.0107 # Unit converted to gC per gC per sec
+Rd.attrib = merge(Rd.attrib,Rday.attrib, by="Room")
+Rd.attrib[,c("R25_leaf","Rday_leaf")] = Rd.attrib[,c("R25_leaf","Rday_leaf")]
+met.rd.attrib = merge(data.attrib[,c("Date","Room","Tair","DateTime_hr","period","LA","Leafmass")],Rd.attrib, by="Room")
 
 # check respiration rates
-check.rd = merge(data.attrib[,c("Date","Room","Tair","DateTime_hr","period","R_leaf","R_stem","R_root")],Rd.attrib, by="Room")
+check.rd = merge(data.attrib[,c("Date","Room","Tair","DateTime_hr","period","R_leaf","R_stem","R_root","LA","Leafmass")],Rd.attrib, by="Room")
+check.rd$Rdtair_leaf = ifelse(check.rd$period=="Day",with(check.rd,Rday_leaf*0.7^((Tair-25)/10)*(LA/Leafmass)), 
+                              with(check.rd,R25_leaf*2.1^((Tair-25)/10)))
+check.rd[,c("Rdtair_stem","Rdtair_root")] = 
+  with(check.rd, check.rd[,c("R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gC per sec)
+# check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
+#   check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c1) * (15*60) # unit (gC per gC per 15 mins)
 check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-  with(check.rd, check.rd[,c("R25_leaf","R25_stem","R25_root")] * 2.1^((Tair-25)/10)) # unit (gC per gDM per sec)
-check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] = 
-  check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (1/c1) * (15*60) # unit (gC per gC per 15 mins)
-check.rd[check.rd$period == "Day","Rdtair_leaf"] = 0.7*check.rd[check.rd$period == "Day","Rdtair_leaf"] # 30% reduction in leaf respiration during day time
+  check.rd[,c("Rdtair_leaf","Rdtair_stem","Rdtair_root")] * (15*60) # unit (gC per gC per 15 mins)
+# check.rd[check.rd$period == "Day","R_leaf"] = 0.7*check.rd[check.rd$period == "Day","R_leaf"] # 30% reduction in leaf respiration during day time
 Rd.df <- summaryBy(R_leaf+R_stem+R_root+Rdtair_leaf+Rdtair_stem+Rdtair_root ~ Date+Room, data=check.rd, FUN=sum, na.rm=TRUE) # Sum of all same day Rd
+
+write.csv(Rd.df, "parameters/Rd.df.csv", row.names=FALSE)
 
 
 ##################------------------------------
@@ -346,15 +356,15 @@ names(data.attrib.daily) = c("Room","Date","VPD","Tair","PAR","Tgrowth","SLA","L
 
 ######## Plot Meteorological data
 plot.shift[[1]] = plot.VPD.v1(data.attrib.daily, 1)
-plot.shift[[2]] = plot.Tair(data.attrib.daily, 1)
+plot.shift[[2]] = plot.Tair(data.attrib.daily, 2)
 # plot.shift[[3]] = plot.PAR(data.attrib.daily, 3)
 
 ######## Plot both Vcmax25 and Jmax25
-plot.shift[[3]] = plot.Vcmax.Jmax.v1(data.attrib.daily, 1)
+plot.shift[[3]] = plot.Vcmax.Jmax.v1(data.attrib.daily, 3)
 # plot.shift[[3]] = plot.Jmax(data.attrib.daily, 5)
 
 ######## Plot Respiration rates
-plot.shift[[4]] = plot.Rd(data.attrib.daily, 1)
+plot.shift[[4]] = plot.Rd(data.attrib.daily, 4)
 
 ######## Plot Activation energy (Ea) and entropy (∆S)
 # get Vcmax temperature response
@@ -368,7 +378,7 @@ Vcmax.response.rm4 = data.frame(tleaf=tleaf, Room = 4, response = room4)
 Vcmax.response = rbind(Vcmax.response.rm1,Vcmax.response.rm4)
 
 # plot.shift[[5]] = plot.Ea(data.attrib.daily, 1)
-plot.shift[[5]] = plot.Ea(Vcmax.response, 1)
+plot.shift[[5]] = plot.Ea(Vcmax.response, 5)
 
 # get Jmax temperature response
 data.attrib.daily.rm1 = subset(data.attrib.daily, Room == 1) 
@@ -380,10 +390,10 @@ Jmax.response.rm4 = data.frame(tleaf=tleaf, Room = 4, response = room4)
 Jmax.response = rbind(Jmax.response.rm1,Jmax.response.rm4)
 
 # plot.shift[[5]] = plot.dels(data.attrib.daily, 1)
-plot.shift[[6]] = plot.dels(Jmax.response, 1)
+plot.shift[[6]] = plot.dels(Jmax.response, 6)
 
 ######## Plot g1
-plot.shift[[7]] = plot.g1(data.attrib.daily, 1)
+plot.shift[[7]] = plot.g1(data.attrib.daily, 7)
 
 ######## Plot alpha and theta
 PAR<-seq(-100,2000,10)
@@ -395,21 +405,21 @@ room4 = curve.nlslrc(data.attrib.daily.rm4$alpha, data.attrib.daily.rm4$theta, m
 light.response.rm4 = data.frame(PAR=PAR, Room = 4, response = room4$J)
 light.response = rbind(light.response.rm1,light.response.rm4)
 
-plot.shift[[8]] = plot.alpha.theta(light.response, 1)
+plot.shift[[8]] = plot.alpha.theta(light.response, 8)
 
 ######## Plot SLA
 sla.harvest.all = read.csv("processed_data/sla.harvest.all.csv")
 sla.harvest.all = subset(sla.harvest.all, Room %in% as.factor(c("1","4")))
 sla.harvest.all$Date = as.Date(sla.harvest.all$Date)
 
-plot.shift[[9]] = plot.SLA(data.attrib.daily, sla.harvest.all, 1)
+plot.shift[[9]] = plot.SLA.v1(data.attrib.daily, sla.harvest.all, 9)
 
 # Plot individual modelled parameters ("k","Y","af","sf") against "volume"
-plot.shift[[10]] = plot.allocation.fractions(data.attrib.daily, 1)
+plot.shift[[10]] = plot.allocation.fractions(data.attrib.daily, 10)
 
-plot.shift[[11]] = plot.Y(data.attrib.daily, 1)
+plot.shift[[11]] = plot.Y(data.attrib.daily, 11)
 
-plot.shift[[12]] = plot.k(data.attrib.daily, 1)
+plot.shift[[12]] = plot.k(data.attrib.daily, 12)
 
 
 png("output/Figure_parameter_shifting_rm1-4_params.png", units="px", width=3000, height=1500, res=250)

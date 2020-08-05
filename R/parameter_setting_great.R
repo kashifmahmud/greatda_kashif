@@ -1,16 +1,11 @@
 # # Setting lower and upper bounds of the prior parameter pdf, and starting point of the chain
 # Try wide priors
 #-------------------------------------------------------------------------------------
-if (levels(treat.group) != "6") {
-  param.Y <- matrix(c(0.2,0.3,0.4) , nrow=1, ncol=3, byrow=T)
-  param.af <- matrix(c(0,0.5,1) , nrow=1, ncol=3, byrow=T) # Forcing af not to be negetive
-  param.as <- matrix(c(0,0.3,1) , nrow=1, ncol=3, byrow=T)
+param.Y <- matrix(c(0.2,0.3,0.4) , nrow=1, ncol=3, byrow=T)
+param.af <- matrix(c(0,0.5,1) , nrow=1, ncol=3, byrow=T) # Forcing af not to be negetive
+param.as <- matrix(c(0,0.3,1) , nrow=1, ncol=3, byrow=T)
 # param.sf <- matrix(c(0,0.0005,0.001) , nrow=1, ncol=3, byrow=T) # All Groups having same sf
 # param.sr <- matrix(c(0,0.0005,0.001) , nrow=1, ncol=3, byrow=T) # All Groups having same sr
- } else {
-  param.af <- matrix(c(0.6,0.7,1) , nrow=1, ncol=3, byrow=T) # Forcing af not to be negetive
-  param.as <- matrix(c(0.2,0.3,0.5) , nrow=1, ncol=3, byrow=T)
-}
 
 #-------------------------------------------------------------------------------------
 
@@ -47,11 +42,7 @@ if (with.storage==F) {
   pMaxima <- param[ ,c("Y_max","af_max","as_max")]
   pValues <- param[ ,c("Y","af","as")] # Starting point of the chain
 } else { # (with.storage==T) 
-  if (levels(treat.group) != "6") {
-    param.k <- matrix(c(0.3,0.6,1) , nrow=1, ncol=3, byrow=T)
-  } else {
-    param.k <- matrix(c(0,0.2,0.4) , nrow=1, ncol=3, byrow=T)
-  }
+  param.k <- matrix(c(0.3,0.6,1) , nrow=1, ncol=3, byrow=T)
   if (no.param > 1) {
     param.k <- rbind(param.k, c(-(param.k[3]-param.k[1])/2/nrow(data.set), 0, (param.k[3]-param.k[1])/2/nrow(data.set)))
   } 
